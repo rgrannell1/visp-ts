@@ -7,6 +7,7 @@ import {
 } from "./types"
 
 import PC from "./pc"
+import constants from "./constants";
 
 const Parser = {} as Record<string, Function>
 
@@ -37,5 +38,20 @@ Parser.comment = (input:ParseSource):ParseSuccess|ParseError => {
       return Parse.error({
         message: `I could not parse the boolean value, which should be either "#t" or "#f" but was "${candidate}"`
       })
+  }
+}
+
+Parser.number = (input: ParseSource) => {
+  const matches = constants.regexp.number.exec(input.source)
+
+  if (matches) {
+    const match = matches[0]
+    return Parse.success(match, input.accept(match.length))
+  } else {
+    return Parse.error({
+      message: `I could not parse the number, as a number should match the regular expression "${constants.regexp.number}" but didn't\n\n` +
+        `for example, some valid numbers are:` +
+        ['0', '+1', '-1', '-10.5', '10.5', '+10.5'].join('\n')
+    })
   }
 }
