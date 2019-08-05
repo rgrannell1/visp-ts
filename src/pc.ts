@@ -10,7 +10,7 @@ import {
 
 const PC = {} as Record<string, Function>
 
-PC.all = (parsers:Array<Parser>):Parser => {
+PC.allOf = (parsers:Array<Parser>):Parser => {
   return (input: ParseSource): ParseResult => {
 
     const acc = []
@@ -31,6 +31,56 @@ PC.all = (parsers:Array<Parser>):Parser => {
   }
 }
 
+/*
+
+for (const parser of parsers) {
+  const result = parser(input)
+
+  if (result.isFailure) {
+    continue
+  }
+
+  if (result.isFailure === false && result.data === undefined) {
+    throw new Error('undefined data returned from parser')
+  }
+
+  return result
+}
+
+return Parser.failure({
+  message: `I could not parse the input with any of the supplied choice of parsers`
+})
+
+
+*/
+
+PC.oneOf = (parsers:Array<Parser>):Parser => {
+  return (input: ParseSource): ParseResult => {
+    let partial
+
+    for (const parser of parsers) {
+      const result = parser(input)
+
+      if (isParsePartial(result)) {
+        partial = result
+        continue
+      } else if (isParseError(result)) {
+        continue
+      }
+
+      return result
+    }
+
+    if (partial) {
+      return partial
+    } else {
+      return Parse.error({
+        message: `I could not parse the input with any of the supplied choice of parsers`
+      })
+    }
+  }
+}
+
 PC.optional = (parser:Parser):Parser => {
   return (input:ParseSource):ParseResult => {
     const result = parser(input)
@@ -40,7 +90,6 @@ PC.optional = (parser:Parser):Parser => {
       : result
   }
 }
-
 
 PC.input = (source:string):ParseSource => {
   const data = {

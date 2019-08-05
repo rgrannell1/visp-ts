@@ -83,13 +83,46 @@ const spaceChars = new Set([' ', '  ', ',', '\n'])
 Parser.whitespace = (input: ParseSource): ParseSuccess | ParseError => {
   let included = 0
 
-  while (spaceChars.has(input.source.charAt(included)) && included < input.source.length - 1) {
+  while (spaceChars.has(input.source.charAt(included)) && included < input.source.length) {
     included++
   }
 
   return Parse.success(input.peek(included), input.accept(included))
 }
 
-const input = PC.input('')
+Parser.expression = (input: ParseSource): ParseSuccess | ParseError => {
+  const part = PC.oneOf([
+    Parser.boolean,
+    Parser.string,
+    Parser.number,
+    Parser.comment
+  ])
+
+  // -- todo add return
+
+}
+
+/**
+
+  const part = Parser.oneOf([
+    parser.binaryCall,
+    parser.call,
+    parser.list,
+    parser.boolean,
+    parser.inert,
+    parser.string,
+    parser.number,
+    parser.comment,
+    parser.symbol,
+    parser.keyword
+  ])
+
+  return Parser.many1(Parser.extract(parser.whitespace, part))(input)
+
+
+
+*/
+
+const input = PC.input('      ')
 const x = Parser.whitespace(input)
 x
