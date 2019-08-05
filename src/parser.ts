@@ -77,3 +77,19 @@ Parser.string = (input: ParseSource): ParseSuccess | ParseError => {
 
   return Parse.success(input.peek(included + 1), input.accept(included + 1))
 }
+
+const spaceChars = new Set([' ', '  ', ',', '\n'])
+
+Parser.whitespace = (input: ParseSource): ParseSuccess | ParseError => {
+  let included = 0
+
+  while (spaceChars.has(input.source.charAt(included)) && included < input.source.length - 1) {
+    included++
+  }
+
+  return Parse.success(input.peek(included), input.accept(included))
+}
+
+const input = PC.input('')
+const x = Parser.whitespace(input)
+x
