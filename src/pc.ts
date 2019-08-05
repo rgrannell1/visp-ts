@@ -52,6 +52,9 @@ PC.input = (source:string):ParseSource => {
       data.lineNumber += (data.source.match(/\n/g) || []).length
 
       return data
+    },
+    peek (to:number) {
+      return data.source.slice(0, to)
     }
   }
 

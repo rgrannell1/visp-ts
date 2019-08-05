@@ -41,9 +41,10 @@ Parser.comment = (input:ParseSource):ParseSuccess|ParseError => {
   }
 }
 
-Parser.number = (input: ParseSource) => {
+Parser.number = (input: ParseSource): ParseSuccess | ParseError => {
   const matches = constants.regexp.number.exec(input.source)
 
+  // -- TODO: refactor to partial matches
   if (matches) {
     const match = matches[0]
     return Parse.success(match, input.accept(match.length))
@@ -54,4 +55,25 @@ Parser.number = (input: ParseSource) => {
         ['0', '+1', '-1', '-10.5', '10.5', '+10.5'].join('\n')
     })
   }
+}
+
+Parser.string = (input: ParseSource): ParseSuccess | ParseError => {
+  if (input.peek(1) !== '"') {
+    return Parse.error({
+      message: `I could not parse the string, which should begin with " but was ${input.peek(1)}`
+    })
+  }
+
+  let included = 1
+  while (input.peek(included) !== '"') {
+    if (included === input.source.length) {
+      return Parse.error({
+        message: `I could not parse the string, as the input ended before it reached a closing "`
+      })
+    }
+
+    ++included
+  }
+
+  return Parse.success(input.peek(included + 1), input.accept(included + 1))
 }

@@ -3,7 +3,8 @@ export interface ParseSource {
   source: string,
   index: number,
   lineNumber: number,
-  accept(to: number): ParseSource
+  accept(to: number): ParseSource,
+  peek(to:number): string
 }
 
 export interface ParseSuccess {
