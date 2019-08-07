@@ -9,9 +9,9 @@ import {
 import PC from "./pc"
 import constants from "./constants";
 
-const Parser = {} as Record<string, Function>
+const Parsers = {} as Record<string, Function>
 
-Parser.comment = (input:ParseSource):ParseSuccess|ParseError => {
+Parsers.comment = (input:ParseSource):ParseSuccess|ParseError => {
   if (input.source[0] !== ';') {
     return Parse.error({
       message: `I could not parse the comment, the first character was "${input.source[0]}" but I expected ";"`
@@ -29,7 +29,7 @@ Parser.comment = (input:ParseSource):ParseSuccess|ParseError => {
   return Parse.success(input.source.slice(0, newLineIdx), input.accept(newLineIdx))
 }
 
- Parser.boolean = (input: ParseSource): ParseSuccess | ParseError => {
+ Parsers.boolean = (input: ParseSource): ParseSuccess | ParseError => {
    const candidate = input.source.slice(0, 2)
 
    if (candidate === '#t' || candidate === '#f') {
@@ -41,7 +41,7 @@ Parser.comment = (input:ParseSource):ParseSuccess|ParseError => {
   }
 }
 
-Parser.number = (input: ParseSource): ParseSuccess | ParseError => {
+Parsers.number = (input: ParseSource): ParseSuccess | ParseError => {
   const matches = constants.regexp.number.exec(input.source)
 
   // -- TODO: refactor to partial matches
@@ -57,7 +57,7 @@ Parser.number = (input: ParseSource): ParseSuccess | ParseError => {
   }
 }
 
-Parser.string = (input: ParseSource): ParseSuccess | ParseError => {
+Parsers.string = (input: ParseSource): ParseSuccess | ParseError => {
   if (input.peek(1) !== '"') {
     return Parse.error({
       message: `I could not parse the string, which should begin with " but was ${input.peek(1)}`
@@ -80,7 +80,7 @@ Parser.string = (input: ParseSource): ParseSuccess | ParseError => {
 
 const spaceChars = new Set([' ', '  ', ',', '\n'])
 
-Parser.whitespace = (input: ParseSource): ParseSuccess | ParseError => {
+Parsers.whitespace = (input: ParseSource): ParseSuccess | ParseError => {
   let included = 0
 
   while (spaceChars.has(input.source.charAt(included)) && included < input.source.length) {
@@ -90,39 +90,37 @@ Parser.whitespace = (input: ParseSource): ParseSuccess | ParseError => {
   return Parse.success(input.peek(included), input.accept(included))
 }
 
-Parser.expression = (input: ParseSource): ParseSuccess | ParseError => {
+Parsers.expression = (input: ParseSource): ParseSuccess | ParseError => {
   const part = PC.oneOf([
-    Parser.boolean,
-    Parser.string,
-    Parser.number,
-    Parser.comment
+    Parsers.boolean,
+    Parsers.string,
+    Parsers.number,
+    Parsers.comment
   ])
 
-  // -- todo add return
-
+  // -- add space extraction...
+  return PC.many1(part)(input)
 }
 
 /**
 
-  const part = Parser.oneOf([
-    parser.binaryCall,
-    parser.call,
-    parser.list,
-    parser.boolean,
-    parser.inert,
-    parser.string,
-    parser.number,
-    parser.comment,
-    parser.symbol,
-    parser.keyword
+  const part = Parsers.oneOf([
+    parsers.binaryCall,
+    parsers.call,
+    parsers.list,
+    parsers.boolean,
+    parsers.inert,
+    parsers.string,
+    parsers.number,
+    parsers.comment,
+    parsers.symbol,
+    parsers.keyword
   ])
 
-  return Parser.many1(Parser.extract(parser.whitespace, part))(input)
+  return Parsers.many1(Parsers.extract(parsers.whitespace, part))(input)
 
 
 
 */
 
-const input = PC.input('      ')
-const x = Parser.whitespace(input)
-x
+export default Parsers
