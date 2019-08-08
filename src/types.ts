@@ -1,10 +1,7 @@
 
 export interface ParseSource {
   source: string,
-  index: number,
   lineNumber: number,
-  accept(to: number): ParseSource,
-  peek(to:number): string
 }
 
 export interface ParseSuccess {
@@ -26,30 +23,29 @@ export interface ParsePartial {
   rest: ParseSource
 }
 
-export const Parse = {} as Record<string, Function>
-
-Parse.success = (data: any, rest: ParseSource): ParseSuccess => {
-  return {
-    data,
-    rest,
-    isSuccess: true
+export const Parse = {
+  success (data: any, rest: ParseSource): ParseSuccess {
+    return {
+      data,
+      rest,
+      isSuccess: true
+    }
+  },
+  partial (data: any, rest:ParseSource): ParsePartial {
+    return {
+      data,
+      rest,
+      isPartial: true
+    }
+  },
+  error (error: any): ParseError {
+    return {
+      error,
+      isError: true
+    }
   }
 }
 
-Parse.partial = (data: any, rest:ParseSource): ParsePartial => {
-  return {
-    data,
-    rest,
-    isPartial: true
-  }
-}
-
-Parse.error = (error: any): ParseError => {
-  return {
-    error,
-    isError: true
-  }
-}
 
 export const ast = {} as Record<string, Function>
 
@@ -61,7 +57,7 @@ export function isParseError(value: ParseResult): value is ParseError {
 }
 
 export function isParseSuccess(value: ParseResult): value is ParseSuccess {
-  return (value as any).isPartial === true
+  return (value as any).isSuccess === true
 }
 
 export function isParsePartial(value: ParseResult): value is ParsePartial {

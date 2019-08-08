@@ -3,7 +3,8 @@ import {
   ParseSource,
   ParseSuccess,
   ParseError,
-  Parse
+  Parse,
+  ParseResult
 } from "./types"
 
 import PC from "./pc"
@@ -11,7 +12,7 @@ import constants from "./constants";
 
 const Parsers = {} as Record<string, Function>
 
-Parsers.comment = (input:ParseSource):ParseSuccess|ParseError => {
+Parsers.comment = (input:ParseSource):ParseResult => {
   if (input.source[0] !== ';') {
     return Parse.error({
       message: `I could not parse the comment, the first character was "${input.source[0]}" but I expected ";"`
@@ -26,14 +27,16 @@ Parsers.comment = (input:ParseSource):ParseSuccess|ParseError => {
     }, input)
   }
 
-  return Parse.success(input.source.slice(0, newLineIdx), input.accept(newLineIdx))
+  const next = PC.input(input.source.slice(newLineIdx + 1), input.lineNumber + 1)
+  return Parse.success(input.source.slice(0, newLineIdx + 1), next)
 }
 
  Parsers.boolean = (input: ParseSource): ParseSuccess | ParseError => {
    const candidate = input.source.slice(0, 2)
 
    if (candidate === '#t' || candidate === '#f') {
-     return Parse.success(input.source.slice(0, 2), input.accept(2))
+    const next = PC.input(input.source.slice(2), input.lineNumber)
+    return Parse.success(input.source.slice(0, 2), next)
     } else {
       return Parse.error({
         message: `I could not parse the boolean value, which should be either "#t" or "#f" but was "${candidate}"`
@@ -47,7 +50,9 @@ Parsers.number = (input: ParseSource): ParseSuccess | ParseError => {
   // -- TODO: refactor to partial matches
   if (matches) {
     const match = matches[0]
-    return Parse.success(match, input.accept(match.length))
+    const next = PC.input(input.source.slice(match.length), input.lineNumber)
+
+    return Parse.success(match, next)
   } else {
     return Parse.error({
       message: `I could not parse the number, as a number should match the regular expression "${constants.regexp.number}" but didn't\n\n` +
@@ -58,14 +63,14 @@ Parsers.number = (input: ParseSource): ParseSuccess | ParseError => {
 }
 
 Parsers.string = (input: ParseSource): ParseSuccess | ParseError => {
-  if (input.peek(1) !== '"') {
+  if (input.source[0] !== '"') {
     return Parse.error({
-      message: `I could not parse the string, which should begin with " but was ${input.peek(1)}`
+      message: `I could not parse the string, which should begin with " but was ${input.source[0]}`
     })
   }
 
   let included = 1
-  while (input.peek(included) !== '"') {
+  while (input.source[included] !== '"') {
     if (included === input.source.length) {
       return Parse.error({
         message: `I could not parse the string, as the input ended before it reached a closing "`
@@ -75,7 +80,8 @@ Parsers.string = (input: ParseSource): ParseSuccess | ParseError => {
     ++included
   }
 
-  return Parse.success(input.peek(included + 1), input.accept(included + 1))
+  const next = PC.input(input.source.slice(included + 1), input.lineNumber)
+  return Parse.success(input.source.charAt(included + 1), next)
 }
 
 const spaceChars = new Set([' ', '  ', ',', '\n'])
@@ -87,7 +93,8 @@ Parsers.whitespace = (input: ParseSource): ParseSuccess | ParseError => {
     included++
   }
 
-  return Parse.success(input.peek(included), input.accept(included))
+  const next = PC.input(input.source.slice(included), input.lineNumber)
+  return Parse.success(input.source.charAt(included), next)
 }
 
 Parsers.expression = (input: ParseSource): ParseSuccess | ParseError => {
@@ -101,26 +108,5 @@ Parsers.expression = (input: ParseSource): ParseSuccess | ParseError => {
   // -- add space extraction...
   return PC.many1(part)(input)
 }
-
-/**
-
-  const part = Parsers.oneOf([
-    parsers.binaryCall,
-    parsers.call,
-    parsers.list,
-    parsers.boolean,
-    parsers.inert,
-    parsers.string,
-    parsers.number,
-    parsers.comment,
-    parsers.symbol,
-    parsers.keyword
-  ])
-
-  return Parsers.many1(Parsers.extract(parsers.whitespace, part))(input)
-
-
-
-*/
 
 export default Parsers

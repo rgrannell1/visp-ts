@@ -108,16 +108,15 @@ PC.many1 = (parser:Parser):Parser => {
     while (true) {
       let result = parser(rest)
 
-      if (isParseError(result) || isParsePartial(result)) {
-        break
-      } else if (isParseSuccess(result)) {
+      if (isParseSuccess(result)) {
         acc.push(result.data)
         wasMatched = true
         rest = result.rest
-      } else {
-        break
+        continue
       }
-    }
+
+      break
+     }
 
     if (wasMatched) {
       return Parse.success(acc, rest)
@@ -129,23 +128,11 @@ PC.many1 = (parser:Parser):Parser => {
   }
 }
 
-PC.input = (source:string):ParseSource => {
-  const data = {
+PC.input = (source:string, lineNumber:number = 1):ParseSource => {
+  return {
     source,
-    index: 0,
-    lineNumber: 1,
-    accept (to:number) {
-      data.index += to
-      data.lineNumber += (data.source.match(/\n/g) || []).length
-
-      return data
-    },
-    peek (to:number) {
-      return data.source.slice(0, to)
-    }
+    lineNumber
   }
-
-  return data
 }
 
 export default PC

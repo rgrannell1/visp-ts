@@ -8,6 +8,4 @@ const input = PC.input(`; merp
 `)
 const x = PC.many1(Parsers.comment)(input)
 
-console.log('++ ++ ++')
 console.log(x)
-console.log('++ ++ ++')
