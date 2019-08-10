@@ -13,6 +13,10 @@ import * as ast from "./ast"
 import * as PC from "./pc"
 import constants from "./constants";
 
+import {
+  second
+} from "./utils";
+
 export const comment = (input:ParseSource):ParseResult => {
   if (input.source[0] !== ';') {
     return Parse.error({
@@ -98,10 +102,18 @@ export const whitespace = (input: ParseSource): ParseSuccess | ParseError => {
   let included = 0
   let lines = 0
 
-  while (spaceChars.has(input.source.charAt(included)) && included < input.source.length) {
+  while (true) {
+    let char = input.source.charAt(included)
+    let isSpaceChar = spaceChars.has(char)
+    let inRange = included < input.source.length
+
+    if (!isSpaceChar || !inRange) {
+      break
+    }
+
     included++
 
-    if (input.source.charAt(included) === '\n') {
+    if (char === '\n') {
       lines++
     }
   }
@@ -112,6 +124,12 @@ export const whitespace = (input: ParseSource): ParseSuccess | ParseError => {
   return Parse.success(input.source.slice(0, included), next)
 }
 
+/**
+ *
+ * Parse a visp expression
+ *
+ * @param input the source code of a visp program
+ */
 export const expression = (input: ParseSource): ParseResult => {
   const part = PC.oneOf([
     boolean,
@@ -123,10 +141,7 @@ export const expression = (input: ParseSource): ParseResult => {
   const term = PC.allOf([whitespace, part, whitespace])
   const result = PC.many1(term)(input)
 
-  if (isParseSuccess(result)) {
-    const newData = result.data.map((datum:any):AST => datum[1])
-    return Parse.success(newData, result.rest)
-  } else {
-    return result
+  return isParseSuccess(result)
+    ? Parse.success(result.data.map(second), result.rest)
+    : result
   }
-}
