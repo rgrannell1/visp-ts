@@ -10,6 +10,11 @@ import {
   isParseSuccess,
 } from "./types";
 
+/**
+ * Run a series of parsers, one after another, on input source. If any fails, bail out with an error or partial match.
+ *
+ * @param parsers An array of parsers to run sequentally against input source-code.
+ */
 export const allOf = (parsers:Array<Parser>):Parser => {
   return (input: ParseSource): ParseResult => {
 
@@ -31,6 +36,11 @@ export const allOf = (parsers:Array<Parser>):Parser => {
   }
 }
 
+/**
+ * Attempts to parse input with at least one parser. If all fail, it fails. May return a partial match.
+ *
+ * @param parsers An ordered array of parsers to run against the source in its entirety.
+ */
 export const oneOf = (parsers:Array<Parser>):Parser => {
   return (input: ParseSource): ParseResult => {
     let partial: ParsePartial | undefined

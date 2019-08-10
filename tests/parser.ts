@@ -8,7 +8,7 @@ hypotheses.comment = testing.hypothesis('fp.id returns the supplied value')
   .cases(function* () {
     yield [ '; comment' ]
   })
-  .always(val => {
+  .always((case:Array<string>) => {
     return false
   })
 
