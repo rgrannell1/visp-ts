@@ -98,7 +98,13 @@ export const string = (input: ParseSource): ParseSuccess | ParseError => {
 
 const spaceChars = new Set([' ', '  ', ',', '\n'])
 
-export const whitespace = (input: ParseSource): ParseSuccess | ParseError => {
+/**
+ *
+ * Parses a stretch of whitespace. Returns zero or more characters.
+ *
+ * @param input the input source-code
+ */
+export const whitespace = (input: ParseSource): ParseSuccess => {
   let included = 0
   let lines = 0
 
