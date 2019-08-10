@@ -4,8 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "",
-    "tsc": "tsc"
+    "test": "node pulpfile.js test"
   },
   "author": "",
   "license": "MIT",
