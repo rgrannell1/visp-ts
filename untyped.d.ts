@@ -1,8 +1,12 @@
 
 type condition = (val:any) => Boolean
 
+interface AlwaysReturn {
+  always(condition: condition): AlwaysReturn
+}
+
 interface CasesReturn {
-  always(condition:condition):Object
+  always(condition:condition):AlwaysReturn
 }
 
 interface HypothesisReturn {

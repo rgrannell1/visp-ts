@@ -28,3 +28,9 @@ export const string = (source: string) => {
     source
   }
 }
+
+export const number = (source: string) => {
+  return {
+    source
+  }
+}

@@ -1,10 +1,12 @@
 
 import {
+  AST,
   ParseSource,
   ParseSuccess,
   ParseError,
   Parse,
-  ParseResult
+  ParseResult,
+  isParseSuccess
 } from "./types"
 
 import * as ast from "./ast"
@@ -56,7 +58,7 @@ export const number = (input: ParseSource): ParseSuccess | ParseError => {
     const expr = ast.boolean(input.source.slice(0, match.length))
     const next = PC.input(input.source.slice(match.length), input.lineNumber)
 
-    return Parse.success(match, next)
+    return Parse.success(ast.number(match), next)
   } else {
     return Parse.error({
       message: `I could not parse the number, as a number should match the regular expression "${constants.regexp.number}" but didn't\n\n` +
@@ -119,6 +121,12 @@ export const expression = (input: ParseSource): ParseResult => {
   ])
 
   const term = PC.allOf([whitespace, part, whitespace])
+  const result = PC.many1(term)(input)
 
-  return PC.many1(term)(input)
+  if (isParseSuccess(result)) {
+    const newData = result.data.map((datum:any):AST => datum[1])
+    return Parse.success(newData, result.rest)
+  } else {
+    return result
+  }
 }

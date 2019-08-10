@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node pulpfile.js test"
+    "test": "node pulpfile.js test",
+    "test:watch": "find . -name '*.ts' | entr -s 'npm test'"
   },
   "author": "",
   "license": "MIT",

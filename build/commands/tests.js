@@ -3,7 +3,7 @@ const execa = require('execa')
 
 const command = {
   name: 'test',
-  dependencies: ['build']
+  dependencies: []
 }
 
 command.cli = `

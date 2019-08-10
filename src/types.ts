@@ -60,3 +60,7 @@ export function isParseSuccess(value: ParseResult): value is ParseSuccess {
 export function isParsePartial(value: ParseResult): value is ParsePartial {
   return (value as any).isPartial === true
 }
+
+export interface AST {
+  source: string
+}
