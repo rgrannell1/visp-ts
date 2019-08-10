@@ -7,12 +7,11 @@ import {
   ParseResult
 } from "./types"
 
-import PC from "./pc"
+import * as ast from "./ast"
+import * as PC from "./pc"
 import constants from "./constants";
 
-const Parsers = {} as Record<string, Function>
-
-Parsers.comment = (input:ParseSource):ParseResult => {
+export const comment = (input:ParseSource):ParseResult => {
   if (input.source[0] !== ';') {
     return Parse.error({
       message: `I could not parse the comment, the first character was "${input.source[0]}" but I expected ";"`
@@ -27,16 +26,20 @@ Parsers.comment = (input:ParseSource):ParseResult => {
     }, input)
   }
 
+  const expr = ast.comment(input.source.slice(0, newLineIdx + 1))
   const next = PC.input(input.source.slice(newLineIdx + 1), input.lineNumber + 1)
-  return Parse.success(input.source.slice(0, newLineIdx + 1), next)
+
+  return Parse.success(expr, next)
 }
 
- Parsers.boolean = (input: ParseSource): ParseSuccess | ParseError => {
+export const boolean = (input: ParseSource): ParseSuccess | ParseError => {
    const candidate = input.source.slice(0, 2)
 
    if (candidate === '#t' || candidate === '#f') {
+    const expr = ast.boolean(input.source.slice(0, 2))
     const next = PC.input(input.source.slice(2), input.lineNumber)
-    return Parse.success(input.source.slice(0, 2), next)
+
+    return Parse.success(expr, next)
     } else {
       return Parse.error({
         message: `I could not parse the boolean value, which should be either "#t" or "#f" but was "${candidate}"`
@@ -44,12 +47,13 @@ Parsers.comment = (input:ParseSource):ParseResult => {
   }
 }
 
-Parsers.number = (input: ParseSource): ParseSuccess | ParseError => {
+export const number = (input: ParseSource): ParseSuccess | ParseError => {
   const matches = constants.regexp.number.exec(input.source)
 
   // -- TODO: refactor to partial matches
   if (matches) {
     const match = matches[0]
+    const expr = ast.boolean(input.source.slice(0, match.length))
     const next = PC.input(input.source.slice(match.length), input.lineNumber)
 
     return Parse.success(match, next)
@@ -62,7 +66,7 @@ Parsers.number = (input: ParseSource): ParseSuccess | ParseError => {
   }
 }
 
-Parsers.string = (input: ParseSource): ParseSuccess | ParseError => {
+export const string = (input: ParseSource): ParseSuccess | ParseError => {
   if (input.source[0] !== '"') {
     return Parse.error({
       message: `I could not parse the string, which should begin with " but was ${input.source[0]}`
@@ -80,33 +84,41 @@ Parsers.string = (input: ParseSource): ParseSuccess | ParseError => {
     ++included
   }
 
+  const expr = ast.string(input.source.slice(0, included + 1))
   const next = PC.input(input.source.slice(included + 1), input.lineNumber)
+
   return Parse.success(input.source.charAt(included + 1), next)
 }
 
 const spaceChars = new Set([' ', '  ', ',', '\n'])
 
-Parsers.whitespace = (input: ParseSource): ParseSuccess | ParseError => {
+export const whitespace = (input: ParseSource): ParseSuccess | ParseError => {
   let included = 0
+  let lines = 0
 
   while (spaceChars.has(input.source.charAt(included)) && included < input.source.length) {
     included++
+
+    if (input.source.charAt(included) === '\n') {
+      lines++
+    }
   }
 
-  const next = PC.input(input.source.slice(included), input.lineNumber)
-  return Parse.success(input.source.charAt(included), next)
+  const expr = input.source.slice(included)
+  const next = PC.input(expr, input.lineNumber + lines)
+
+  return Parse.success(input.source.slice(0, included), next)
 }
 
-Parsers.expression = (input: ParseSource): ParseSuccess | ParseError => {
+export const expression = (input: ParseSource): ParseResult => {
   const part = PC.oneOf([
-    Parsers.boolean,
-    Parsers.string,
-    Parsers.number,
-    Parsers.comment
+    boolean,
+    string,
+    number,
+    comment
   ])
 
-  // -- add space extraction...
-  return PC.many1(part)(input)
-}
+  const term = PC.allOf([whitespace, part, whitespace])
 
-export default Parsers
+  return PC.many1(term)(input)
+}

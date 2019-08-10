@@ -1,26 +1,26 @@
 
 export interface ParseSource {
-  source: string,
-  lineNumber: number,
+  readonly source: string,
+  readonly lineNumber: number,
 }
 
 export interface ParseSuccess {
-  isSuccess: true,
-  rest: ParseSource,
-  data: any
+  readonly isSuccess: true,
+  readonly rest: ParseSource,
+  readonly data: any
 }
 
 export interface ParseError {
-  isError: true,
-  error: {
+  readonly isError: true,
+  readonly error: {
     message: string
   }
 }
 
 export interface ParsePartial {
-  isPartial: true,
-  data: any,
-  rest: ParseSource
+  readonly isPartial: true,
+  readonly data: any,
+  readonly rest: ParseSource
 }
 
 export const Parse = {
@@ -45,9 +45,6 @@ export const Parse = {
     }
   }
 }
-
-
-export const ast = {} as Record<string, Function>
 
 export type ParseResult = ParseError | ParsePartial | ParseSuccess
 export type Parser = (input: ParseSource) => ParseResult

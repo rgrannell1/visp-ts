@@ -10,9 +10,7 @@ import {
   isParseSuccess,
 } from "./types";
 
-const PC = {} as Record<string, Function>
-
-PC.allOf = (parsers:Array<Parser>):Parser => {
+export const allOf = (parsers:Array<Parser>):Parser => {
   return (input: ParseSource): ParseResult => {
 
     const acc = []
@@ -33,7 +31,7 @@ PC.allOf = (parsers:Array<Parser>):Parser => {
   }
 }
 
-PC.oneOf = (parsers:Array<Parser>):Parser => {
+export const oneOf = (parsers:Array<Parser>):Parser => {
   return (input: ParseSource): ParseResult => {
     let partial: ParsePartial | undefined
 
@@ -60,7 +58,7 @@ PC.oneOf = (parsers:Array<Parser>):Parser => {
   }
 }
 
-PC.optional = (parser:Parser):Parser => {
+export const optional = (parser:Parser):Parser => {
   return (input:ParseSource):ParseResult => {
     const result = parser(input)
 
@@ -70,36 +68,7 @@ PC.optional = (parser:Parser):Parser => {
   }
 }
 
-/*
-    const acc = []
-    let result = {isFailure: false, rest: input}
-
-    let rest = input
-    let wasMatched = false
-
-    while (true) {
-      result = parser(result.rest)
-
-      if (result.isFailure) {
-        break
-      } else {
-        acc.push(result.data)
-        rest = result.rest
-        wasMatched = true
-      }
-    }
-
-    if (wasMatched) {
-      return Parser.success(acc, rest)
-    } else {
-      return Parser.failure({
-        message: `I could not parse the input once. Expected ${parser.meta().description}`,
-      })
-    }
-
-*/
-
-PC.many1 = (parser:Parser):Parser => {
+export const many1 = (parser:Parser):Parser => {
   return (input: ParseSource): ParseResult => {
     const acc = []
     let rest = input
@@ -128,11 +97,15 @@ PC.many1 = (parser:Parser):Parser => {
   }
 }
 
-PC.input = (source:string, lineNumber:number = 1):ParseSource => {
+/**
+ * Given raw source code construct a parseable object
+ *
+ * @param source the source code to use as a parse input elsewhere
+ * @param lineNumber the starting line number of the source code
+ */
+export const input = (source:string, lineNumber:number = 1):ParseSource => {
   return {
     source,
     lineNumber
   }
 }
-
-export default PC

@@ -1,11 +1,14 @@
 
-import Parsers from "./parser";
-import PC from "./pc";
+import * as Parsers from "./parser";
+import * as PC from "./pc";
 
-const input = PC.input(`; merp
-; merp
-; merp
+const input = PC.input(`
+
+10
+10
+10
+
 `)
-const x = PC.many1(Parsers.comment)(input)
+const x = PC.many1(Parsers.expression)(input)
 
-console.log(x)
+console.log(JSON.stringify(x, null, 2))
