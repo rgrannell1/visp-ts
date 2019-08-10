@@ -1,6 +1,6 @@
 
-import setTests from './index';
+import parserTests from './index';
 
-setTests.run({ report: true }).catch((err:Error) => {
+parserTests.run({ report: true }).catch((err:Error) => {
   throw err;
 })

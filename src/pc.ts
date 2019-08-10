@@ -78,6 +78,11 @@ export const optional = (parser:Parser):Parser => {
   }
 }
 
+/**
+ * Attempt to parse input source repeatedly with a parser. Fails if it doesn't match at least once.
+ *
+ * @param parser the parser to match at least once, but potentially many times
+ */
 export const many1 = (parser:Parser):Parser => {
   return (input: ParseSource): ParseResult => {
     const acc = []
