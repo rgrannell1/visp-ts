@@ -42,6 +42,18 @@ cases.boolean = [
   ['#fmore text', expectedParse('#f', 'more text', 1)],
 ]
 
+cases.number = [
+  ['0', expectedParse('0', '', 1)],
+  ['+0', expectedParse('+0', '', 1)],
+  ['-0', expectedParse('-0', '', 1)],
+  ['14', expectedParse('14', '', 1)],
+  ['+14', expectedParse('+14', '', 1)],
+  ['-14', expectedParse('-14', '', 1)],
+  ['14.15', expectedParse('14.15', '', 1)],
+  ['+14.15', expectedParse('+14.15', '', 1)],
+  ['-14.15', expectedParse('-14.15', '', 1)],
+]
+
 const expectations = {
   hasSource: (res: ParseResult, expected: any) =>
     isParseSuccess(res) && res.data.source === expected.data.source,
@@ -61,16 +73,21 @@ const createCases = (cases: Array<ParseTest>, parser: Parser) => {
 }
 
 const hypotheses = {
-  comment: testing.hypothesis('comments parse successfully')
+  comment: testing.hypothesis('comments cases parse successfully')
     .cases(createCases(cases.comment, parser.comment))
     .always(expectations.hasSource)
     .always(expectations.hasRest)
     .always(expectations.hasLineNumber),
-  boolean: testing.hypothesis('boolean parse successfully')
+  boolean: testing.hypothesis('boolean cases parse successfully')
     .cases(createCases(cases.boolean, parser.boolean))
     .always(expectations.hasSource)
     .always(expectations.hasRest)
     .always(expectations.hasLineNumber),
+  number: testing.hypothesis('number cases parse successfully')
+    .cases(createCases(cases.number, parser.number))
+    .always(expectations.hasSource)
+    .always(expectations.hasRest)
+    .always(expectations.hasLineNumber)
 }
 
 
