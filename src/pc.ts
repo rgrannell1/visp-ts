@@ -88,9 +88,10 @@ export const many1 = (parser:Parser):Parser => {
     const acc = []
     let rest = input
     let wasMatched = false
+    let result
 
     while (true) {
-      let result = parser(rest)
+      result = parser(rest)
 
       if (isParseSuccess(result)) {
         acc.push(result.data)
@@ -105,9 +106,15 @@ export const many1 = (parser:Parser):Parser => {
     if (wasMatched) {
       return Parse.success(acc, rest)
     } else {
-      return Parse.error({
-        message: 'I could not parse the input a single time.'
-      })
+      if (isParseError((result))) {
+        return Parse.error({
+          message: `I could not parse the input a single time. ${result.error.message}`
+        })
+      } else {
+        return Parse.error({
+          message: `I could not parse the input a single time. The parser partially matched`
+        })
+      }
     }
   }
 }

@@ -104,7 +104,7 @@ const spaceChars = new Set([' ', '  ', ',', '\n'])
  *
  * @param input the input source-code
  */
-export const whitespace = (input: ParseSource): ParseSuccess => {
+export const whitespace = (input: ParseSource): ParseSuccess | ParseError => {
   let included = 0
   let lines = 0
 
@@ -122,6 +122,12 @@ export const whitespace = (input: ParseSource): ParseSuccess => {
     if (char === '\n') {
       lines++
     }
+  }
+
+  if (included === 0) {
+    return Parse.error({
+      message: `expected whitespace but found "${input.source.charAt(0)}"`
+    })
   }
 
   const expr = input.source.slice(included)
@@ -150,4 +156,5 @@ export const expression = (input: ParseSource): ParseResult => {
   return isParseSuccess(result)
     ? Parse.success(result.data.map(second), result.rest)
     : result
-  }
+
+}
