@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "node_modules/.bin/tsc && node dist/tests/runner.js",
-    "test:watch": "find . -name '*.ts' | entr -s 'node_modules/.bin/tsc && node dist/src/index.js'",
+    "test:watch": "find . -name '*.ts' | entr -s 'node_modules/.bin/tsc && node dist/tests/runner.js'",
     "play:watch": "find . -name '*.ts' | entr -s 'node_modules/.bin/tsc && node dist/tests/runner.js'"
   },
   "author": "",
