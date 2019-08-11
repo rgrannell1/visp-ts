@@ -20,7 +20,8 @@ import {
 export const comment = (input:ParseSource):ParseResult => {
   if (input.source[0] !== ';') {
     return Parse.error({
-      message: `I could not parse the comment, the first character was "${input.source[0]}" but I expected ";"`
+      message: `I could not parse the comment, the first character was "${input.source[0]}" but I expected ";"`,
+      lineNumber: input.lineNumber
     })
   }
 
@@ -48,7 +49,8 @@ export const boolean = (input: ParseSource): ParseSuccess | ParseError => {
     return Parse.success(expr, next)
     } else {
       return Parse.error({
-        message: `I could not parse the boolean value, which should be either "#t" or "#f" but was "${candidate}"`
+        message: `I could not parse the boolean value, which should be either "#t" or "#f" but was "${candidate}"`,
+        lineNumber: input.lineNumber
       })
   }
 }
@@ -67,7 +69,8 @@ export const number = (input: ParseSource): ParseSuccess | ParseError => {
     return Parse.error({
       message: `I could not parse the number, as a number should match the regular expression "${constants.regexp.number}" but didn't\n\n` +
         `for example, some valid numbers are:` +
-        ['0', '+1', '-1', '-10.5', '10.5', '+10.5'].join('\n')
+        ['0', '+1', '-1', '-10.5', '10.5', '+10.5'].join('\n'),
+      lineNumber: input.lineNumber
     })
   }
 }
@@ -75,7 +78,8 @@ export const number = (input: ParseSource): ParseSuccess | ParseError => {
 export const string = (input: ParseSource): ParseSuccess | ParseError => {
   if (input.source[0] !== '"') {
     return Parse.error({
-      message: `I could not parse the string, which should begin with " but was ${input.source[0]}`
+      message: `I could not parse the string, which should begin with " but was ${input.source[0]}`,
+      lineNumber: input.lineNumber
     })
   }
 
@@ -83,7 +87,8 @@ export const string = (input: ParseSource): ParseSuccess | ParseError => {
   while (input.source[included] !== '"') {
     if (included === input.source.length) {
       return Parse.error({
-        message: `I could not parse the string, as the input ended before it reached a closing "`
+        message: `I could not parse the string, as the input ended before it reached a closing "`,
+        lineNumber: input.lineNumber
       })
     }
 
@@ -126,7 +131,8 @@ export const whitespace = (input: ParseSource): ParseSuccess | ParseError => {
 
   if (included === 0) {
     return Parse.error({
-      message: `expected whitespace but found "${input.source.charAt(0)}"`
+      message: `expected whitespace but found "${input.source.charAt(0)}"`,
+      lineNumber: input.lineNumber
     })
   }
 

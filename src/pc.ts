@@ -62,7 +62,8 @@ export const oneOf = (parsers:Array<Parser>):Parser => {
       return partial
     } else {
       return Parse.error({
-        message: `I could not parse the input with any of the supplied choice of parsers`
+        message: `I could not parse the input with any of the supplied choice of parsers`,
+        lineNumber: input.lineNumber
       })
     }
   }
@@ -107,11 +108,16 @@ export const many1 = (parser:Parser):Parser => {
       return Parse.success(acc, rest)
     } else {
       if (isParseError((result))) {
+        console.log("TCL: rest", rest)
         return Parse.error({
+          lineNumber: rest.lineNumber,
           message: `I could not parse the input a single time. ${result.error.message}`
         })
       } else {
+        console.log("TCL: rest", rest)
+
         return Parse.error({
+          lineNumber: rest.lineNumber,
           message: `I could not parse the input a single time. The parser partially matched`
         })
       }

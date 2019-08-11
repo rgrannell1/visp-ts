@@ -23,6 +23,11 @@ export interface ParsePartial {
   readonly rest: ParseSource
 }
 
+export interface ErrorData {
+  message: string,
+  lineNumber: number
+}
+
 export const Parse = {
   success (data: any, rest: ParseSource): ParseSuccess {
     return {
@@ -38,7 +43,7 @@ export const Parse = {
       isPartial: true
     }
   },
-  error (error: any): ParseError {
+  error (error: ErrorData): ParseError {
     return {
       error,
       isError: true
