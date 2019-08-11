@@ -7,7 +7,13 @@ import {
 } from '../src/types'
 
 interface ExpectedParse {
-
+  data: {
+    source: string
+  },
+  rest: {
+    source: string,
+    lineNumber: number
+  }
 }
 
 const cases:Array<[string, ExpectedParse]> = [
@@ -16,6 +22,15 @@ const cases:Array<[string, ExpectedParse]> = [
     rest: { source: '', lineNumber: 2 }
   }]
 ]
+
+const expectations = {
+  hasSource: (res: ParseResult, expected: any) =>
+    isParseSuccess(res) && res.data.source === expected.data.source,
+  hasRest: (res: ParseResult, expected: any) =>
+    isParseSuccess(res) && res.rest.source === expected.rest.source,
+  hasLineNumber: (res: ParseResult, expected: any) =>
+    isParseSuccess(res) && res.rest.lineNumber === expected.rest.lineNumber
+}
 
 const hypotheses = {} as Record<string, Object>
 
@@ -26,10 +41,9 @@ hypotheses.comment = testing.hypothesis('comments parse successfully')
       yield [ result, expected ]
     }
   })
-  .always((res:ParseResult, expected:any) =>
-    isParseSuccess(res) && res.data.source === expected.data.source)
-  .always((res: ParseResult, expected: any) =>
-    isParseSuccess(res) && res.rest.source === expected.rest.source)
+  .always(expectations.hasSource)
+  .always(expectations.hasRest)
+  .always(expectations.hasLineNumber)
 
 const theory = testing.theory({ description: 'Establish parsers work as expected' })
   .givenAll(hypotheses)
