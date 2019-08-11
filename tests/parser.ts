@@ -3,7 +3,7 @@ import testing from '@rgrannell/testing'
 import * as parser from '../src/parser'
 import * as PC from '../src/pc'
 import {
-  ParseSource, ParseResult
+  ParseSource, ParseResult, isParseSuccess
 } from '../src/types'
 
 interface ExpectedParse {
@@ -12,7 +12,8 @@ interface ExpectedParse {
 
 const cases:Array<[string, ExpectedParse]> = [
   ['; comment\n', {
-
+    data: { source: '; comment\n' },
+    rest: { source: '', lineNumber: 2 }
   }]
 ]
 
@@ -25,9 +26,10 @@ hypotheses.comment = testing.hypothesis('comments parse successfully')
       yield [ result, expected ]
     }
   })
-  .always((result:ParseResult, expected:any) => {
-    return true
-  })
+  .always((res:ParseResult, expected:any) =>
+    isParseSuccess(res) && res.data.source === expected.data.source)
+  .always((res: ParseResult, expected: any) =>
+    isParseSuccess(res) && res.rest.source === expected.rest.source)
 
 const theory = testing.theory({ description: 'Establish parsers work as expected' })
   .givenAll(hypotheses)
