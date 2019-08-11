@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "node pulpfile.js test",
-    "test:watch": "find . -name '*.ts' | entr -s 'npm test'",
-    "play:watch": "find . -name '*.ts' | entr -s 'node_modules/.bin/tsc && node dist/src/index.js'"
+    "test:watch": "find . -name '*.ts' | entr -s 'node_modules/.bin/tsc && node dist/src/index.js'",
+    "play:watch": "find . -name '*.ts' | entr -s 'node_modules/.bin/tsc && node dist/tests/runner.js'"
   },
   "author": "",
   "license": "MIT",

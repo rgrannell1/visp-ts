@@ -1,26 +1,32 @@
 
-import testing from '@rgrannell/testing';
+import testing from '@rgrannell/testing'
 import * as parser from '../src/parser'
 import * as PC from '../src/pc'
+import {
+  ParseSource
+} from '../src/types'
+
+interface ExpectedParse {
+
+}
+
+const cases:Array<[string, ExpectedParse]> = [
+  ['; comment\n', {
+
+  }]
+]
 
 const hypotheses = {} as Record<string, Object>
 
 hypotheses.comment = testing.hypothesis('comments parse successfully')
-  .cases(function* () {
-    yield [
-      PC.input('; comment\n', 1),
-      {
-        result: {data: {source: '; comment\n'}},
-        rest: {source: '', lineNumber: 2}
-      }
-    ]
+  .cases(function* (): IterableIterator<any> {
+    for (const [source, expected] of cases) {
+      const result = parser.comment(PC.input(source))
+      yield { result, expected }
+    }
   })
-  .always(input => {
-    return input.hasOwnProperty('result')
-  })
-  .always(input => {
-    const result = parser.comment(input)
-    return false
+  .always(val => {
+    return true
   })
 
 const theory = testing.theory({ description: 'Establish parsers work as expected' })

@@ -10,7 +10,7 @@ interface CasesReturn {
 }
 
 interface HypothesisReturn {
-  cases(generator:Function):CasesReturn
+  cases(generator:() => IterableIterator<any>):CasesReturn
 }
 
 interface runArgs {

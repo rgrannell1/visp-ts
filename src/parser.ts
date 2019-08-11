@@ -162,5 +162,4 @@ export const expression = (input: ParseSource): ParseResult => {
   return isParseSuccess(result)
     ? Parse.success(result.data.map(second), result.rest)
     : result
-
 }
