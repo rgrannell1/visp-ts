@@ -3,7 +3,7 @@ import testing from '@rgrannell/testing'
 import * as parser from '../src/parser'
 import * as PC from '../src/pc'
 import {
-  ParseSource
+  ParseSource, ParseResult
 } from '../src/types'
 
 interface ExpectedParse {
@@ -22,10 +22,10 @@ hypotheses.comment = testing.hypothesis('comments parse successfully')
   .cases(function* (): IterableIterator<any> {
     for (const [source, expected] of cases) {
       const result = parser.comment(PC.input(source))
-      yield { result, expected }
+      yield [ result, expected ]
     }
   })
-  .always(val => {
+  .always((result:ParseResult, expected:any) => {
     return true
   })
 

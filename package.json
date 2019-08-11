@@ -14,7 +14,7 @@
   "devDependencies": {
     "@rgrannell/index": "^8.2.0",
     "@rgrannell/pulp": "^8.2.0",
-    "@rgrannell/testing": "^8.2.0",
+    "@rgrannell/testing": "^8.4.0",
     "execa": "^2.0.3",
     "ts-node": "^8.3.0",
     "tsconfig-paths": "^3.8.0",

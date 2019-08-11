@@ -1,5 +1,5 @@
 
-type condition = (val:any) => Boolean
+type condition = (...val:any) => Boolean
 
 interface AlwaysReturn {
   always(condition: condition): AlwaysReturn
