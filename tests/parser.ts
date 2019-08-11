@@ -16,7 +16,11 @@ interface ExpectedParse {
   }
 }
 
-const cases:Array<[string, ExpectedParse]> = [
+type ParseTest = [string, ExpectedParse]
+
+const cases = {} as Record<string, Array<ParseTest>>
+
+cases.comment = [
   ['; comment\n', {
     data: { source: '; comment\n' },
     rest: { source: '', lineNumber: 2 }
@@ -32,15 +36,19 @@ const expectations = {
     isParseSuccess(res) && res.rest.lineNumber === expected.rest.lineNumber
 }
 
+const createCases = (cases:Array<ParseTest>) => {
+  return function* (): IterableIterator<any> {
+    for (const [source, expected] of cases) {
+      const result = parser.comment(PC.input(source))
+      yield [result, expected]
+    }
+  }
+}
+
 const hypotheses = {} as Record<string, Object>
 
 hypotheses.comment = testing.hypothesis('comments parse successfully')
-  .cases(function* (): IterableIterator<any> {
-    for (const [source, expected] of cases) {
-      const result = parser.comment(PC.input(source))
-      yield [ result, expected ]
-    }
-  })
+  .cases(createCases(cases.comment))
   .always(expectations.hasSource)
   .always(expectations.hasRest)
   .always(expectations.hasLineNumber)
