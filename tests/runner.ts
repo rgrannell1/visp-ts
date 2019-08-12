@@ -11,23 +11,22 @@ Description:
 
 const args = docopt.docopt(doc, {})
 
-const opts = args['--only-failure'] === true
-  ? { report: true }
-  : {}
-
-
 async function main () {
-  const { results } = await parserTests.run(opts)
-  const tests = results[0]
+  if (args['--only-failure']) {
+    const { results } = await parserTests.run({ })
+    const tests = results[0]
 
-  // -- retrieve failed and errored
-  let testFailures:Array<any> = []
+    // -- retrieve failed and errored
+    let testFailures:Array<any> = []
 
-  tests.results.forEach((resultSet:any) => {
-    testFailures = testFailures.concat(resultSet.failed())
-  })
+    tests.results.forEach((resultSet:any) => {
+      testFailures = testFailures.concat(resultSet.failed())
+    })
 
-  console.log(testFailures)
+    console.log(testFailures)
+  } else {
+    await parserTests.run({ report: true })
+  }
 }
 
 main()
