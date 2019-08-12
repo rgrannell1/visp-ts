@@ -5,12 +5,17 @@
   "main": "index.js",
   "scripts": {
     "test": "node_modules/.bin/tsc && node dist/tests/runner.js",
+    "test:debug": "node_modules/.bin/tsc && node dist/tests/runner.js --only-failures",
     "test:watch": "find . -name '*.ts' | entr -s 'node_modules/.bin/tsc && node dist/tests/runner.js'",
     "play:watch": "find . -name '*.ts' | entr -s 'node_modules/.bin/tsc && node dist/tests/runner.js'"
   },
   "author": "",
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "@types/docopt": "^0.6.31",
+    "@types/node": "^12.7.1",
+    "docopt": "^0.6.2"
+  },
   "devDependencies": {
     "@rgrannell/index": "^8.2.0",
     "@rgrannell/pulp": "^8.2.0",

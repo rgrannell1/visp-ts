@@ -1,3 +1,4 @@
+
 import {
   ParseTest,
   expectedParse,
@@ -10,12 +11,9 @@ import * as parser from "../../src/parser";
 import * as PC from '../../src/pc'
 import { ParseSuccess, ParseResult } from "../../src/types";
 
-export const take = function* <T> (range:number, iter:IterableIterator<T>) {
-  for (let ith = 0; ith < range; ++ith) [
-    yield iter.next()
-  ]
-}
-
+/**
+ * Yield random junk the parsers should ignore
+ */
 const rest = function* (): IterableIterator<string> {
   yield ''
   yield 'more text'
@@ -23,6 +21,9 @@ const rest = function* (): IterableIterator<string> {
 
 type GeneratorResult = IterableIterator<[ParseResult, ExpectedParse]>
 
+/**
+ * Yield random booleans as test-cases
+ */
 export const boolean = function* (): GeneratorResult {
   const cases = ['#t', '#f']
 
@@ -37,20 +38,26 @@ export const boolean = function* (): GeneratorResult {
   }
 }
 
+/**
+ * Yield random comments as test-cases
+ */
 export const comment = function* (): GeneratorResult {
-  const cases = [';\n', ';comment\n']
+  const cases = [';\n', ';\n']
 
   for (const text of rest()) {
     for (const tcase of cases) {
       const full = `${tcase}${text}`
       yield [
         parser.comment(PC.input(full)),
-        expectedParse(tcase, text, 1)
+        expectedParse(tcase, text, 2)
       ]
     }
   }
 }
 
+/**
+ * Yield random numbers as test-cases
+ */
 export const number = function * (): GeneratorResult {
   for (const text of rest()) {
     for (const tcase of random.repeat(random.number)) {
