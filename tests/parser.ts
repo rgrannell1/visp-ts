@@ -1,6 +1,7 @@
 
 import testing from '@rgrannell/testing'
 import * as parser from '../src/parser'
+import * as generators from './utils/generators'
 import * as PC from '../src/pc'
 import {
   ParseSource,
@@ -8,39 +9,13 @@ import {
   isParseSuccess,
   Parser
 } from '../src/types'
-
-interface ExpectedParse {
-  data: {
-    source: string
-  },
-  rest: {
-    source: string,
-    lineNumber: number
-  }
-}
-
-type ParseTest = [string, ExpectedParse]
-
-const expectedParse = (data: string, rest: string, lineNumber: number): ExpectedParse => {
-  return {
-    data: { source: data },
-    rest: { source: rest, lineNumber }
-  }
-}
+import {
+  ParseTest,
+  expectedParse,
+  ExpectedParse
+} from './utils/types'
 
 const cases = {} as Record<string, Array<ParseTest>>
-
-cases.comment = [
-  [';\n', expectedParse(';\n', '', 2)],
-  ['; comment\n', expectedParse('; comment\n', '', 2)],
-  ['; comment\nmore text', expectedParse('; comment\n', 'more text', 2)],
-]
-
-cases.boolean = [
-  ['#t', expectedParse('#t', '', 1)],
-  ['#f', expectedParse('#f', '', 1)],
-  ['#fmore text', expectedParse('#f', 'more text', 1)],
-]
 
 cases.number = [
   ['0', expectedParse('0', '', 1)],
@@ -72,14 +47,31 @@ const createCases = (cases: Array<ParseTest>, parser: Parser) => {
   }
 }
 
+const RANGE = 100
+
+const yieldCases = (iter: any) => function* (): IterableIterator<[ParseResult, ExpectedParse]> {
+  let counter = 0
+
+  for (const val of iter) {
+    yield val
+    ++counter
+
+    if (counter > RANGE) {
+      break
+    }
+  }
+}
+
+// -- use generators, product, and take to create test cases.
+
 const hypotheses = {
   comment: testing.hypothesis('comments cases parse successfully')
-    .cases(createCases(cases.comment, parser.comment))
+    .cases(yieldCases(generators.comment()))
     .always(expectations.hasSource)
     .always(expectations.hasRest)
     .always(expectations.hasLineNumber),
   boolean: testing.hypothesis('boolean cases parse successfully')
-    .cases(createCases(cases.boolean, parser.boolean))
+    .cases(yieldCases(generators.boolean()))
     .always(expectations.hasSource)
     .always(expectations.hasRest)
     .always(expectations.hasLineNumber),
@@ -89,7 +81,6 @@ const hypotheses = {
     .always(expectations.hasRest)
     .always(expectations.hasLineNumber)
 }
-
 
 export default testing.theory({ description: 'Establish parsers work as expected' })
   .givenAll(hypotheses)
