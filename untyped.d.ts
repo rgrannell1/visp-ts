@@ -17,8 +17,16 @@ interface runArgs {
   report?: boolean
 }
 
+interface RunResult {
+  results: Array<{
+    results: Array<{
+      failed ():any
+    }>
+  }>
+}
+
 interface GivenAllReturn {
-  run(args:runArgs):Promise<any>
+  run(args:runArgs):Promise<RunResult>
 }
 
 interface TheoryReturn {
