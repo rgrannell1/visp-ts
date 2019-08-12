@@ -42,7 +42,7 @@ export const comment = function* (): GeneratorResult {
     for (const tcase of cases) {
       const full = `${tcase}${text}`
       yield [
-        parser.boolean(PC.input(full)),
+        parser.comment(PC.input(full)),
         expectedParse(tcase, text, 1)
       ]
     }
