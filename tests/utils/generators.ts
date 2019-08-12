@@ -4,6 +4,8 @@ import {
   ExpectedParse
 } from "./types"
 
+import * as random from './random'
+
 import * as parser from "../../src/parser";
 import * as PC from '../../src/pc'
 import { ParseSuccess, ParseResult } from "../../src/types";
@@ -43,6 +45,18 @@ export const comment = function* (): GeneratorResult {
       const full = `${tcase}${text}`
       yield [
         parser.comment(PC.input(full)),
+        expectedParse(tcase, text, 1)
+      ]
+    }
+  }
+}
+
+export const number = function * (): GeneratorResult {
+  for (const text of rest()) {
+    for (const tcase of random.repeat(random.number)) {
+      const full = `${tcase}${text}`
+      yield [
+        parser.number(PC.input(full)),
         expectedParse(tcase, text, 1)
       ]
     }

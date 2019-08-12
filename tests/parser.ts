@@ -15,20 +15,6 @@ import {
   ExpectedParse
 } from './utils/types'
 
-const cases = {} as Record<string, Array<ParseTest>>
-
-cases.number = [
-  ['0', expectedParse('0', '', 1)],
-  ['+0', expectedParse('+0', '', 1)],
-  ['-0', expectedParse('-0', '', 1)],
-  ['14', expectedParse('14', '', 1)],
-  ['+14', expectedParse('+14', '', 1)],
-  ['-14', expectedParse('-14', '', 1)],
-  ['14.15', expectedParse('14.15', '', 1)],
-  ['+14.15', expectedParse('+14.15', '', 1)],
-  ['-14.15', expectedParse('-14.15', '', 1)],
-]
-
 const expectations = {
   hasSource: (res: ParseResult, expected: any) =>
     isParseSuccess(res) && res.data.source === expected.data.source,
@@ -76,7 +62,7 @@ const hypotheses = {
     .always(expectations.hasRest)
     .always(expectations.hasLineNumber),
   number: testing.hypothesis('number cases parse successfully')
-    .cases(createCases(cases.number, parser.number))
+    .cases(yieldCases(generators.number()))
     .always(expectations.hasSource)
     .always(expectations.hasRest)
     .always(expectations.hasLineNumber)
