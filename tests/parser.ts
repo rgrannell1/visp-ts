@@ -65,6 +65,11 @@ const hypotheses = {
     .cases(yieldCases(generators.number()))
     .always(expectations.hasSource)
     .always(expectations.hasRest)
+    .always(expectations.hasLineNumber),
+  string: testing.hypothesis('string cases parse successfully')
+    .cases(yieldCases(generators.string()))
+    .always(expectations.hasSource)
+    .always(expectations.hasRest)
     .always(expectations.hasLineNumber)
 }
 

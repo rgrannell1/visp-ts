@@ -69,3 +69,18 @@ export const number = function * (): GeneratorResult {
     }
   }
 }
+
+/**
+ * Yield random strings as test-cases
+ */
+export const string = function * (): GeneratorResult {
+  for (const text of rest()) {
+    for (const tcase of random.repeat(random.string)) {
+      const full = `${tcase}${text}`
+      yield [
+        parser.string(PC.input(full)),
+        expectedParse(tcase, text, 1)
+      ]
+    }
+  }
+}
